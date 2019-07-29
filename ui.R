@@ -9,22 +9,34 @@ data<-read_csv("Leading Causes of Death.csv")
 deathData<- data %>% select(Year, `Cause Name`, State, Deaths, `Age-adjusted Death Rate`)
 
 shinyUI(fluidPage(navbarPage(
-    "App Title",
+    "Exploring the 10 Leading Cause of Death in The United States",
     tabPanel("Information",
         sidebarLayout(
-             sidebarPanel(),
-             mainPanel("Information", textOutput("informationText"))
+            sidebarPanel(
+                h4("Link to Data:"),
+                a("NCHS-Leading Cause of Death: United States Data", href="https://catalog.data.gov/dataset/age-adjusted-death-rates-for-the-top-10-leading-causes-of-death-united-states-2013")),
+             mainPanel(
+                 h1("The Data:"),
+                 textOutput("theData"),
+                 h1("The App:"),
+                 textOutput("appDataExplore"),
+                 br(),
+                 textOutput("clustering"),
+                 br(),
+                 textOutput("datamodeling"),
+                 br(),
+                 textOutput("datatable"))
              )),
     tabPanel("Data Exploration",
         sidebarLayout(
              sidebarPanel(
-                h3("User Specifications for Graphical Summaries:"),
+                h3(HTML("User Specifications for <em>Graphical Summaries</em>:")),
                 h5("Choose State:"),
                 selectizeInput("State", "State", choices=levels(as.factor(deathData$State))),
-                h3("User specifications for Numeric Summaries:"),
-                h5("Choose Cause Name for Five Number Summary:"),
+                h3(HTML("User Specifications for <em>Numeric Summaries</em>:")),
+                h5("Choose Cause Name for Five Number Summary of Deaths:"),
                 selectizeInput("Cause Name","Cause of Death Name", levels(as.factor(deathData$`Cause Name`))),
-                h5("Choose State for Five Number Summary:"),
+                h5("Choose State for Five Number Summary of Deaths:"),
                 selectizeInput("statesum", "State", levels(as.factor(deathData$State))),
                 checkboxInput("checkbox","Choose Year for Proportional Data?"),
                 conditionalPanel(condition="input.checkbox",
@@ -66,10 +78,10 @@ shinyUI(fluidPage(navbarPage(
                 selectInput('xcol', 'X Variable', c("Deaths", "Year", "Age-adjusted Death Rate")),
                 h4("Select Y Variable:"),
                 selectInput('ycol', 'Y Variable', c("Deaths", "Year", "Age-adjusted Death Rate"), selected="Age-adjusted Death Rate"),
-                h4("Select Number of Clusters:"),
+                h4("Select Number of Clusters (max 10):"),
                 numericInput('clusters','Cluster Count',4, min=1, max=10),
-                h4("Select Number of Algoirth Iterations:"),
-                numericInput('iteration', 'Number of Iterations of Algorithm', value=1, min=1, max=15)
+                h4("Select Number of Algoirth Iterations (max 20):"),
+                numericInput('iteration', 'Number of Iterations of Algorithm', value=1, min=1, max=20)
             ),
             mainPanel(
                 fluidRow(

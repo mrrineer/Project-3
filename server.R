@@ -19,9 +19,21 @@ shinyServer(function(input, output, session) {
   })
   
   #create information text
-  output$informationText<- renderText(
-  "insert text later")
+  output$theData<- renderText(
+  "The data utilized for this app contains information on the 10 leading causes of Death in the United States. The variables present are: Year, State, Cause Name, Deaths, and Age-adjusted Death Rate. The data was collected beginning in 1999 and up through 2016.The data was gleaned from all resident death certificates filed in all 50 states as well as D.C. Age-adjusted death rates(per 100,000 population) were based upon the 2000 U.S. standard population and populations used for computing death rates after 2010 are estimates beased on the 2010 census.")
   
+  output$appDataExplore<-renderText(
+    "The app begins with Graphical Summaries of the data collected on the 10 leading causes of Death in the United States from 1999-2016. Under the 'Data Exploration' tab the user begins by selecting a state of interest and then they can view of scatterplot depicting deaths per year that is color-coordinated by the cause of death name. The user can also view a scatterplot of the age-adjusted death rate per year that is also color-coordinated by the cause of death name. These two graphical summaries allow the user to view how the number of deaths and age-adjusted death rate for each cause of death varies year to year as well as from state to state. The user is also able to generate numeric summaries on the 'Data Exploration' tab. The user can specify the cause of death and state of interest in order to generate the five number summary for the deaths variable. In addition, the user can also choose to specify a year of interest in order to see a print out of the proportion of all deaths accounted for by the 10 leading causes of death.")
+  
+  output$clustering<-renderText(
+    "Within the 'Clustering' tab the user is able to see a visual of K Means Clustering. The user is able to specify the x variable, y variable, cluster count, and the number of iterations of the algorithm and the visual updates appropriately. This allows the user to visual in real time how the cluster assignments change based on cluster count as well as iterations of the algorithm. The user is also able to visual for themselves where the data seems to fall into natural clusters.")
+  
+  output$datamodeling<-renderText(
+    "Within the 'Data Modeling' tab the user is able to choose a state and cause of death of interest and a simple linear regression model of deaths vs year, as well as, a simple linear regression model of age-adjusted death rate vs year are generated. The summary statistics for each model fit is also provided for the user to view. Within the summary statistic ouput the adjusted R square value is provided which gives the user a measure of how well the model is doing. For each simple linear regression fit the user is also able to input a year of interest and predict both the deaths and the age-adjusted death rate for the specified state and cause of death.  In addition the a K Nearest Neighbors model is fit with the data. The user is able to input age-adjusted eath rate and deaths in order to predict the cause of death with the K Nearest Neighbors model.")
+  
+  output$datatable<-renderText(
+    "Within the 'Data Table' table the user is able to scroll through the entire data set that was used throughout the app. The data has a search function and is able to be sorted via the arrows next to each column name so as to allow the user to view data of interest more quickly.  In addition the user is able to download the data table to a csv file if interested.")
+
   
   #create deaths and year plot 
   output$deathPlot <- renderPlot({
