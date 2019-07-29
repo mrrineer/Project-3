@@ -6,12 +6,12 @@ library(DT)
 library(caret)
 
 
+#bring in data
+data<-read_csv("Leading Causes of Death.csv") 
+#filter data
+deathData<- data %>% select(Year, `Cause Name`, State, Deaths, `Age-adjusted Death Rate`)
+
 shinyServer(function(input, output, session) {
- 
-   #bring in data
-  data<-read_csv("Leading Causes of Death.csv") 
-  #filter data
-  deathData<- data %>% select(Year, `Cause Name`, State, Deaths, `Age-adjusted Death Rate`)
   
   #make data reactive
   getData<-reactive({
