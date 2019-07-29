@@ -2,7 +2,10 @@ library(ggplot2)
 library(shiny)
 library(plotly)
 
-
+#bring in data
+data<-read_csv("Leading Causes of Death.csv") 
+#filter data
+deathData<- data %>% select(Year, `Cause Name`, State, Deaths, `Age-adjusted Death Rate`)
 
 shinyUI(fluidPage(navbarPage(
     "App Title",
