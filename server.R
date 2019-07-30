@@ -264,7 +264,7 @@ shinyServer(function(input, output, session) {
     data.frame(`Age-adjusted Death Rate`=input$ageRate, Deaths= input$numDeaths)
   })
       #fit model
-      knnFit <- train(`Cause Name` ~ `Age-adjusted Death Rate`+Deaths, data = deathDataTrain, method = "knn",
+      knnFit <- train(`Cause Name` ~ `Age-adjusted Death Rate`+Deaths, data = deathData, method = "knn",
                        trControl = trainControl(method = "repeatedcv", number = 10, repeats = 5),
                        preProcess = c("center", "scale"))
   output$knn<-renderPrint({  
