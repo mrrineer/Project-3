@@ -16,10 +16,6 @@ test <- dplyr::setdiff(1:nrow(deathData), train)
 deathDataTest <- deathData[test, ]
 deathDataTrain <- deathData[train, ]
 
-knnTest <- train(`Cause Name` ~ `Age-adjusted Death Rate`+Deaths, data = deathDataTrain, method = "knn",
-                 trControl = trainControl(method = "repeatedcv", number = 10, repeats = 5),
-                 preProcess = c("center", "scale"))
-
 #set up server file
 shinyServer(function(input, output, session) {
 
@@ -181,8 +177,6 @@ shinyServer(function(input, output, session) {
     points(clusters()$centers, pch=4, cex=4, lwd=4)
   })
   
-  
-  
   #begin code for data modeling tab
   #simple linear regression
   #deaths vs year plot
@@ -261,13 +255,19 @@ shinyServer(function(input, output, session) {
   })
   
   #k nearest neighbors model
+  getknnData<-reactive({
+    knnData<-deathData %>% filter(`Age-adjusted Death Rate`==input$ageRate) %>% filter(Deaths ==input$numDeaths)
+  })
     
     #predict cause of death name via death rate and number of deaths
+  
     output$knn<-renderPrint({
-    predict(train(`Cause Name` ~ `Age-adjusted Death Rate`+Deaths, data = deathData, method = "knn",
-                  trControl = trainControl(method = "repeatedcv", number = 10, repeats = 5),
-                  preProcess = c("center", "scale")), 
-            newdata=data.frame(`Age-adjusted Death Rate`=input$ageRate,Deaths=input$numDeaths))
+      #fit model
+      knnFit <- train(`Cause Name` ~ `Age-adjusted Death Rate`+Deaths, data = deathDataTrain, method = "knn",
+                       trControl = trainControl(method = "repeatedcv", number = 10, repeats = 5),
+                       preProcess = c("center", "scale"))
+      
+    predict(knnFit, newdata=data.frame(`Age-adjusted Death Rate`=input$ageRate,Deaths=input$numDeaths))
     
   })
   
