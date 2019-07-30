@@ -252,24 +252,21 @@ shinyServer(function(input, output, session) {
   })
   
   #k nearest neighbors model
-  getknnData<-reactive({
     #create training and test sets
     set.seed(7)
     train <- sample(1:nrow(deathData), size = nrow(deathData)*0.8)
     test <- dplyr::setdiff(1:nrow(deathData), train)
     deathDataTrain <- deathData[train, ]
     deathDataTest <- deathData[test, ]
-  })
+
     #train model
-    output$knn<-renderPrint({
-    knnFit <- train(
-                     `Cause Name` ~ `Age-adjusted Death Rate`+ Deaths, 
+    knnFit <- train(`Cause Name` ~ `Age-adjusted Death Rate`+ Deaths, 
                      data = deathDataTrain, 
                      method = "knn", 
                      trControl = trainControl(method = "repeatedcv", number = 10, repeats = 5), 
                      preProcess = c("center", "scale"))
     #predict cause of death name via death rate and number of deaths
-    
+    output$knn<-renderPrint({
     predict(knnFit, newdata=data.frame(`Age-adjusted Death Rate`=input$inputAgeRate,Deaths=input$inputDeaths))
     
   })
