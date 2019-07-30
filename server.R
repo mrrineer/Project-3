@@ -255,7 +255,7 @@ shinyServer(function(input, output, session) {
   output$knn<-renderPrint({
     #create training and test sets
     set.seed(7)
-    train <- sample(1:nrow(deathData), size = nrow(filtered)*0.8)
+    train <- sample(1:nrow(deathData), size = nrow(deathData)*0.8)
     test <- dplyr::setdiff(1:nrow(deathData), train)
     deathDataTrain <- deathData[train, ]
     deathDataTest <- deathData[test, ]
