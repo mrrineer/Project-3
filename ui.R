@@ -9,12 +9,13 @@ data<-read_csv("Leading Causes of Death.csv")
 deathData<- data %>% select(Year, `Cause Name`, State, Deaths, `Age-adjusted Death Rate`)
 
 shinyUI(fluidPage(navbarPage(
-    "Exploring the 10 Leading Cause of Death in The United States",
+    "Exploration of the 10 Leading Causes of Death in The United States",
     tabPanel("Information",
         sidebarLayout(
             sidebarPanel(
                 h4("Link to Data:"),
-                a("NCHS-Leading Cause of Death: United States Data", href="https://catalog.data.gov/dataset/age-adjusted-death-rates-for-the-top-10-leading-causes-of-death-united-states-2013")),
+                a("NCHS-Leading Cause of Death: United States Data", href="https://catalog.data.gov/dataset/age-adjusted-death-rates-for-the-top-10-leading-causes-of-death-united-states-2013",
+                  target="_blank")),
              mainPanel(
                  h1("The Data:"),
                  textOutput("theData"),
@@ -31,12 +32,12 @@ shinyUI(fluidPage(navbarPage(
         sidebarLayout(
              sidebarPanel(
                 h3(HTML("User Specifications for <em>Graphical Summaries</em>:")),
-                h5("Choose State:"),
+                h5("Select State:"),
                 selectizeInput("State", "State", choices=levels(as.factor(deathData$State))),
                 h3(HTML("User Specifications for <em>Numeric Summaries</em>:")),
-                h5("Choose Cause Name for Five Number Summary of Deaths:"),
+                h5("Select Cause of Death Name for Five Number Summary of Deaths:"),
                 selectizeInput("Cause Name","Cause of Death Name", levels(as.factor(deathData$`Cause Name`))),
-                h5("Choose State for Five Number Summary of Deaths:"),
+                h5("Select State for Five Number Summary of Deaths:"),
                 selectizeInput("statesum", "State", levels(as.factor(deathData$State))),
                 checkboxInput("checkbox","Choose Year for Proportional Data?"),
                 conditionalPanel(condition="input.checkbox",
@@ -68,6 +69,8 @@ shinyUI(fluidPage(navbarPage(
                         br(),
                         br(),
                         h4(uiOutput("text")),
+                        withMathJax(),
+                        helpText('The formula: $$\\frac{\\text{ deaths for specified cause name} }{\\text{deaths for all causes}}$$'),
                         verbatimTextOutput("summary"))))
         )
         ),
@@ -97,34 +100,44 @@ shinyUI(fluidPage(navbarPage(
                  sidebarPanel(
                      style="position:fixed;width:inherit;",
                      fluidRow(
-                            h4("Choose State"),
+                            h4("Select State:"),
                             selectizeInput("place", "State", choices=levels(as.factor(deathData$State))),
-                            h4("Choose Cause Name"),
+                            h4("Select Cause of Death Name:"),
                             selectizeInput("disease","Cause of Death Name", levels(as.factor(deathData$`Cause Name`)))
                          )),
                      mainPanel(
                          fluidRow(
                              column(12,align="center",
                                     h1("Simple Linear Regression"))),
+                         br(),
                          fluidRow(
                             column(6,
                          plotOutput("simpLinRegPlot1"),
                          downloadButton("simpDownload1","Download Deaths vs Year Plot"),
+                         br(),
                          verbatimTextOutput("regsummary1"),
                          numericInput("inputYearPredictDeaths", label="Input Year to Predict Number of Deaths:", value=2016, min=2016, max=2050),
                          verbatimTextOutput("predictDeaths")),
                          column(6,
                                 plotOutput("simpLinRegPlot2"),
                                 downloadButton("simpDownload2","Download Age-adjusted Death Rate vs Year"),
+                                br(),
                                 verbatimTextOutput("regsummary2"),
                                 numericInput("inputYearPredictRate", label="Input Year to Predict Age-adjusted Death Rate:", value=2016, min=2016, max=2050),
                          verbatimTextOutput("predictRate"))),
+                         br(),
                                 fluidRow(
                                     column(12,align="center",
                                            h1("K Nearest Neighbors"))),
-                         numericInput("inputAgeRate",label="Input Age-adjusted Death Rate to Predict Cause Name", value=1, min=0, max=1500),
-                         numericInput("inputDeaths", label="Input Number of Deaths to Predict Cause Name",value=1, min=0, max=3000000),
-                         verbatimTextOutput("knn")
+                         br(),
+                         fluidRow(
+                             column(6,
+                                 numericInput("inputAgeRate",label="Input Age-adjusted Death Rate to Predict Cause Name:", value=1, min=0, max=1500)),
+                             column(6,
+                                numericInput("inputDeaths", label="Input Number of Deaths to Predict Cause Name:",value=1, min=0, max=3000000))),
+                        fluidRow(
+                            column(12, align="center",
+                                verbatimTextOutput("knn")))
                      )
              )),
     tabPanel("Data Table",
@@ -136,7 +149,7 @@ shinyUI(fluidPage(navbarPage(
                  mainPanel(
                      fluidRow(
                          column(12, align="center",
-                                h1("Ten Leading Causes of Deaths in The United States from 1999-2016 Data")
+                                h1("Ten Leading Causes of Deaths in The United States from 1999-2016")
                      )),
                      DT::dataTableOutput("table"))
         )
