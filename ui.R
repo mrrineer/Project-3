@@ -2,6 +2,7 @@ library(ggplot2)
 library(shiny)
 library(plotly)
 library(tidyverse)
+library(caret)
 
 #bring in data
 data<-read_csv("Leading Causes of Death.csv") 
