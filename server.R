@@ -15,6 +15,7 @@ train <- sample(1:nrow(deathData), size = nrow(deathData)*0.8)
 test <- dplyr::setdiff(1:nrow(deathData), train)
 deathDataTest <- deathData[test, ]
 deathDataTrain <- deathData[train, ]
+names(deathDataTrain)[5]<-"Age.adjusted.Death.Rate"
 
 #set up server file
 shinyServer(function(input, output, session) {
@@ -264,7 +265,7 @@ shinyServer(function(input, output, session) {
     data.frame(`Age-adjusted Death Rate`=input$ageRate, Deaths= input$numDeaths)
   )
       #fit model
-      knnFit <- train(`Cause Name` ~ `Age-adjusted Death Rate`+Deaths, data = deathData, method = "knn",
+      knnFit <- train(`Cause Name` ~ Age.adjusted.Death.Rate+Deaths, data = deathDataTrain, method = "knn",
                        trControl = trainControl(method = "repeatedcv", number = 10, repeats = 5),
                        preProcess = c("center", "scale"))
   output$knn<-renderPrint({  
