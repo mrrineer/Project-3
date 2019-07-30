@@ -264,7 +264,7 @@ shinyServer(function(input, output, session) {
     
     #predict cause of death name via death rate and number of deaths
     output$knn<-renderPrint({
-    predict(train(`Cause Name` ~ `Age-adjusted Death Rate`+Deaths, data = deathDataTrain, method = "knn",
+    predict(train(`Cause Name` ~ `Age-adjusted Death Rate`+Deaths, data = deathData, method = "knn",
                   trControl = trainControl(method = "repeatedcv", number = 10, repeats = 5),
                   preProcess = c("center", "scale")), 
             newdata=data.frame(`Age-adjusted Death Rate`=input$ageRate,Deaths=input$numDeaths))
