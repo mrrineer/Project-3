@@ -260,9 +260,9 @@ shinyServer(function(input, output, session) {
   })
     
     #predict cause of death name via death rate and number of deaths
-  df<-reactive({
+  df<-reactive(
     data.frame(`Age-adjusted Death Rate`=input$ageRate, Deaths= input$numDeaths)
-  })
+  )
       #fit model
       knnFit <- train(`Cause Name` ~ `Age-adjusted Death Rate`+Deaths, data = deathData, method = "knn",
                        trControl = trainControl(method = "repeatedcv", number = 10, repeats = 5),
