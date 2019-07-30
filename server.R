@@ -11,12 +11,6 @@ data<-read_csv("Leading Causes of Death.csv")
 #filter data
 deathData<- data %>% select(Year, `Cause Name`, State, Deaths, `Age-adjusted Death Rate`)
 
-train <- sample(1:nrow(deathData), size = nrow(deathData)*0.8)
-test <- dplyr::setdiff(1:nrow(deathData), train)
-deathDataTest <- deathData[test, ]
-deathDataTrain <- deathData[train, ]
-names(deathDataTrain)[5]<-"Age.adjusted.Death.Rate"
-
 #set up server file
 shinyServer(function(input, output, session) {
 
@@ -264,6 +258,13 @@ shinyServer(function(input, output, session) {
   df<-reactive(
     data.frame(`Age-adjusted Death Rate`=input$ageRate, Deaths= input$numDeaths)
   )
+  #train and test sets
+  train <- sample(1:nrow(deathData), size = nrow(deathData)*0.8)
+  test <- dplyr::setdiff(1:nrow(deathData), train)
+  deathDataTest <- deathData[test, ]
+  deathDataTrain <- deathData[train, ]
+  names(deathDataTrain)[5]<-"Age.adjusted.Death.Rate"
+  
       #fit model
       knnFit <- train(`Cause Name` ~ Age.adjusted.Death.Rate+Deaths, data = deathDataTrain, method = "knn",
                        trControl = trainControl(method = "repeatedcv", number = 10, repeats = 5),
