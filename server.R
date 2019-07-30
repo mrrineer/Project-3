@@ -259,6 +259,7 @@ shinyServer(function(input, output, session) {
     deathDataTrain <- deathData[train, ]
     deathDataTest <- deathData[test, ]
     #train model
+    output$knn<-renderPrint({
     knnFit <- train(
                      `Cause Name` ~ `Age-adjusted Death Rate`+ Deaths, 
                      data = deathDataTrain, 
@@ -266,7 +267,7 @@ shinyServer(function(input, output, session) {
                      trControl = trainControl(method = "repeatedcv", number = 10, repeats = 5), 
                      preProcess = c("center", "scale"))
     #predict cause of death name via death rate and number of deaths
-    output$knn<-renderPrint({
+    
     predict(knnFit, newdata=data.frame(`Age-adjusted Death Rate`=input$inputAgeRate,Deaths=input$inputDeaths))
     
   })
