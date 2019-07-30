@@ -267,7 +267,7 @@ shinyServer(function(input, output, session) {
                      preProcess = c("center", "scale"))
     #predict cause of death name via death rate and number of deaths
     output$knn<-renderPrint({
-    predict(knnFit, newdata=data.frame(`Age-adjusted Death Rate`=input$inputAgeRate,Deaths=input$inputDeaths),terms=character)
+    predict(knnFit, newdata=data.frame(`Age-adjusted Death Rate`=input$ageRate,Deaths=input$numDeaths),terms=character)
     
   })
   

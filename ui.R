@@ -8,13 +8,6 @@ data<-read_csv("Leading Causes of Death.csv")
 #filter data
 deathData<- data %>% select(Year, `Cause Name`, State, Deaths, `Age-adjusted Death Rate`)
 
-#create training and test sets
-set.seed(7)
-train <- sample(1:nrow(deathData), size = nrow(deathData)*0.8)
-test <- dplyr::setdiff(1:nrow(deathData), train)
-deathDataTrain <- deathData[train, ]
-deathDataTest <- deathData[test, ]
-
 #set up UI file
 shinyUI(fluidPage(navbarPage(
     "Exploration of the 10 Leading Causes of Death in The United States",
@@ -144,9 +137,9 @@ shinyUI(fluidPage(navbarPage(
                     br(),
                     fluidRow(
                         column(6,
-                            numericInput("inputAgeRate",label="Input Age-adjusted Death Rate to Predict Cause of Death Name:", value=1, min=0, max=1500)),
+                            numericInput("ageRate",label="Input Age-adjusted Death Rate to Predict Cause of Death Name:", value=1, min=0, max=1500)),
                         column(6,
-                            numericInput("inputDeaths", label="Input Number of Deaths to Predict Cause of Death Name:",value=1, min=0, max=3000000))),
+                            numericInput("numDeaths", label="Input Number of Deaths to Predict Cause of Death Name:",value=1, min=0, max=3000000))),
                     fluidRow(
                         column(12, align="center",
                             verbatimTextOutput("knn")))
