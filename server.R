@@ -11,16 +11,12 @@ data<-read_csv("Leading Causes of Death.csv")
 #filter data
 deathData<- data %>% select(Year, `Cause Name`, State, Deaths, `Age-adjusted Death Rate`)
 
+#set up server file
 shinyServer(function(input, output, session) {
-  
-  #make data reactive
-  getData<-reactive({
-    newData<-deathData %>% filter(State==input$State)
-  })
-  
-  #create information text
+
+  #create text for information tab formatted to break into paragraphs
   output$theData<- renderText(
-  "The data utilized for this app contains information on the 10 leading causes of death in the United States. The variables present are: Year, State, Cause Name, Deaths, and Age-adjusted Death Rate. The data was collected beginning in 1999 and up through 2016.The data was gleaned from all resident death certificates filed in all 50 states as well as D.C. Age-adjusted death rates (per 100,000 population) were based upon the 2000 U.S. standard population and populations used for computing death rates after 2010 are estimates beased on the 2010 census.")
+  "The data utilized for this app contains information on the 10 leading causes of death in the United States. The   variables present are: Year, State, Cause Name, Deaths, and Age-adjusted Death Rate. The data was collected beginning in 1999 and up through 2016.The data was gleaned from all resident death certificates filed in all 50 states as well as D.C. Age-adjusted death rates (per 100,000 population) were based upon the 2000 U.S. standard population and populations used for computing death rates after 2010 are estimates beased on the 2010 census.")
   
   output$appDataExplore<-renderText(
     "The app begins with Graphical Summaries of the data collected on the 10 leading causes of death in the United States from 1999-2016. Under the 'Data Exploration' tab the user begins by selecting a state of interest and then they can view a scatterplot depicting deaths per year that is color-coordinated by the cause of death name. The user can also view a scatterplot of the age-adjusted death rate per year that is again color-coordinated by the cause of death name. These two graphical summaries allow the user to view how the number of deaths and age-adjusted death rate for each cause of death varies year to year as well as from state to state. The user is also able to generate numeric summaries on the 'Data Exploration' tab as well. The user can specify the cause of death and state of interest in order to generate the five number summary for the death variable. In addition, the user can also choose to specify a year of interest in order to see a print out of the proportion of all deaths accounted for by the 10 leading causes of death.")
@@ -34,15 +30,22 @@ shinyServer(function(input, output, session) {
   output$datatable<-renderText(
     "Within the 'Data Table' tab the user is able to scroll through the entire data set that was used throughout the app. The data has a search function and is able to be sorted via the arrows next to each column name so as to allow the user to view data of interest more quickly.  In addition, the user is able to download the data table to a csv file if interested.")
 
+  #begin code for data exploration tab
+  #graphical summaries
+  #make data reactive
+  getData<-reactive({
+    newData<-deathData %>% filter(State==input$State)
+  })
   
   #create deaths and year plot 
   output$deathPlot <- renderPlot({
-    #get data
+    #get reactive data
     newData<-getData()
-    
+    #create plot
     g <- ggplot(newData, aes (x = Year, y = Deaths))
     g+geom_point(size=3, aes(col=`Cause Name`))+ggtitle("Deaths Per Year in User Specified State")+labs(col="Cause of Death Name")+theme(plot.title=element_text(hjust=.5))
   })
+  #create code to allow user to hover over plot and output the x and y coordinates
   output$deathInfo<-renderText({
     xy_str <- function(e) {
       if(is.null(e)) return("NULL\n")
@@ -51,14 +54,12 @@ shinyServer(function(input, output, session) {
     paste0("hover: ", xy_str(input$plot_hover))
   })
 
-  #death plot download button
+  #create death plot download button
   plotInput=function(){
     newData<-getData()
-    
     g <- ggplot(newData, aes (x = Year, y = Deaths))
-    g+geom_point(size=3, aes(col=`Cause Name`))+ggtitle("Deaths Per Year in User Specified State")+labs(col="Cause of Death Name")+theme(plot.title=element_text(hjust=.5))
-    
-  }
+    g+geom_point(size=3, aes(col=`Cause Name`))+ggtitle("Deaths Per Year in User Specified State")+labs(col="Cause of Death Name")+theme(plot.title=element_text(hjust=.5))}
+  
   output$deathDownload<-downloadHandler(
     filename='deathPlot.png',
     content=function(file){
@@ -75,6 +76,7 @@ shinyServer(function(input, output, session) {
     g1+geom_point(size=3, aes(col=`Cause Name`))+ggtitle("Age-adjusted Death Rate Per Year \n in User Specified State")+labs(col="Cause of Death Name")+ylab("Age-adjusted Death Rate")+theme(plot.title=element_text(hjust=.5))
   })
   
+  #hover capabilities 
   output$rateInfo<-renderText({
     xy_str <- function(e) {
       if(is.null(e)) return("NULL\n")
@@ -88,8 +90,8 @@ shinyServer(function(input, output, session) {
     newData<-getData()
     g1<-ggplot(newData, aes(x=Year, y=`Age-adjusted Death Rate`))+ggtitle("Age-adjusted Death Rate Per Year \n in User Specified State")+labs(col="Cause of Death Name")+ylab("Age-adjusted Death Rate")
     g1+geom_point(size=3, aes(col=`Cause Name`))+theme(plot.title=element_text(hjust=.5))
-    
   }
+  
   output$ageAdjDownload<-downloadHandler(
     filename='ageAdjustedDeathRatePlot.png',
     content=function(file){
@@ -99,20 +101,15 @@ shinyServer(function(input, output, session) {
       ggsave(file,plot=ageplotInput(),device=device)
     })
   
-  
   #numeric summaries
-
+  #create proportion of all deaths accounted for by each of the 10 leading causes of death output
   output$summary<-renderPrint({
     deathDatastat<-deathData %>% filter(State==input$State) %>% filter(Year==input$Year)
-    
     deathDatastat[1:10,4]/sum(deathDatastat[11,4])
     as.data.frame(deathDatastat[1:10,4]/sum(deathDatastat[11,4]), row.names =c("Kidney Disease", "Suicide","Alzheimer's Disease","Influenze and Pneumonia", "Diabetes", "Unintential Injuries","Chronic Lower Respiratory Disease", "Stroke","Cancer","Heart Disease"))
   })
   
-
-  
-  
-  
+  #make title reactive to update with the year selected by the user
   output$text<-renderUI({
     if(input$Year == 1999){
       "Proportion of All Deaths Accounted for by 10 Leading Causes of Death in 1999:"
@@ -152,7 +149,6 @@ shinyServer(function(input, output, session) {
       "Proportion of All Deaths Accounted for by 10 Leading Causes of Death in 2016:"
     }
     })
-    
   
   #five number summary
   output$fivesum<-renderPrint({
@@ -160,7 +156,8 @@ shinyServer(function(input, output, session) {
     summary(dataFiveSum$Deaths)
   })
   
-  #k means cluster
+  #begin code for clustering tab
+  #k means cluster plot 
   selectedData<-reactive({
     deathData[,c(input$xcol, input$ycol)]
   })
@@ -177,9 +174,9 @@ shinyServer(function(input, output, session) {
   
   
   
-  #data modeling
+  #begin code for data modeling tab
   #simple linear regression
-  
+  #deaths vs year plot
   getRegData<-reactive({
     regData<-deathData %>% filter(State==input$place) %>% filter(`Cause Name` ==input$disease)
   })
@@ -188,7 +185,7 @@ shinyServer(function(input, output, session) {
     ggplot(regData, aes(x=Year, y=Deaths)) + geom_point() + stat_smooth(method="lm", col="blue")+ggtitle("Deaths vs Year for User Specified \n State and Cause of Death Name")+theme(plot.title=element_text(hjust=.5))
   })
   
-  #download button
+  #download button for deaths vs year plot
   deathRegPlotInput=function(){
     regData<-getRegData()
     
@@ -203,25 +200,29 @@ shinyServer(function(input, output, session) {
       }
       ggsave(file,plot=deathRegPlotInput(),device=device)
     })
-  
-  
-  
+  #fit summary stats for death vs year 
   output$regsummary1<-renderPrint({
     regData<-getRegData()
     fit<-lm(Deaths~ Year, regData)
     summary(fit)
   })
   
+  #predict number of deaths via year with model
+  output$predictDeaths<-renderPrint({
+    regData<-getRegData()
+    invisible(cat(predict(lm(Deaths~ Year, regData),newdata=data.frame(Year=input$inputYearPredictDeaths))))
+  })
+  
+  #age-adjusted death rate vs year plot
   getRegData<-reactive({
     regData<-deathData %>% filter(State==input$place) %>% filter(`Cause Name` ==input$disease)
   })
   output$simpLinRegPlot2 <- renderPlot({
-    #get data
     regData<-getRegData()
     ggplot(regData, aes(x=Year, y=`Age-adjusted Death Rate`))+geom_point()+stat_smooth(method="lm", col="red")+ylab("Age-adjusted Death Rate")+ggtitle("Age-adjusted Death Rate vs Year for User Specified \n State and Cause of Death Name ") + theme(plot.title=element_text(hjust=.5))
   })
   
-  #download button
+  #download button for age-adjusted death rate vs year plot
   ageAdjRegPlotInput=function(){
     regData<-getRegData()
     
@@ -237,23 +238,20 @@ shinyServer(function(input, output, session) {
       ggsave(file,plot=ageAdjRegPlotInput(),device=device)
     })
   
+  #summary stats for age-adjusted death rate vs year model fit
   output$regsummary2<-renderPrint({
     regData<-getRegData()
     fit<-lm(`Age-adjusted Death Rate`~ Year, regData)
     summary(fit)
   })
+  
+  #predict age-adjusted death rate via year with model
   output$predictRate<-renderPrint({
     regData<-getRegData()
     invisible(cat(predict(lm(`Age-adjusted Death Rate`~ Year, regData),newdata=data.frame(Year=input$inputYearPredictRate))))
   })
   
-  
-  output$predictDeaths<-renderPrint({
-    regData<-getRegData()
-    invisible(cat(predict(lm(Deaths~ Year, regData),newdata=data.frame(Year=input$inputYearPredictDeaths))))
-  })
-  
-  #k nearest neighbors
+  #k nearest neighbors model
   output$knn<-renderPrint({
     #create training and test sets
     set.seed(7)
@@ -268,15 +266,18 @@ shinyServer(function(input, output, session) {
                      method = "knn", 
                      trControl = trainControl(method = "repeatedcv", number = 10, repeats = 5), 
                      preProcess = c("center", "scale"))
+    #predict cause of death name via death rate and number of deaths
     predict(knnFit, newdata=data.frame(`Age-adjusted Death Rate`=input$inputAgeRate,Deaths=input$inputDeaths))
     
   })
   
-  #data table
+  #begin code for data table tab
+  #create data table
   output$table<-DT::renderDataTable({
     DT::datatable(deathData, rownames=F)
   })
-  #download button
+  
+  #download data table to csv file button
   output$downloadData<-downloadHandler(
     filename="deathDataTable.csv",
     content=function(file){

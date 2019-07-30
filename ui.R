@@ -8,8 +8,10 @@ data<-read_csv("Leading Causes of Death.csv")
 #filter data
 deathData<- data %>% select(Year, `Cause Name`, State, Deaths, `Age-adjusted Death Rate`)
 
+#set up UI file
 shinyUI(fluidPage(navbarPage(
     "Exploration of the 10 Leading Causes of Death in The United States",
+    #set up infromation tab
     tabPanel("Information",
         sidebarLayout(
             sidebarPanel(
@@ -28,6 +30,7 @@ shinyUI(fluidPage(navbarPage(
                  br(),
                  textOutput("datatable"))
              )),
+    #set up data exploration tab
     tabPanel("Data Exploration",
         sidebarLayout(
              sidebarPanel(
@@ -46,21 +49,21 @@ shinyUI(fluidPage(navbarPage(
              mainPanel(
                  fluidRow(
                      column(12,align="center",
-                 h1("Graphical Summaries:"))),
+                        h1("Graphical Summaries:"))),
                  fluidRow(
                      column(6,
-                 plotOutput("deathPlot", hover= "plot_hover"), 
-                 verbatimTextOutput("deathInfo"),
-                 downloadButton("deathDownload", "Download Death Plot")),
-                 column(6,
-                 plotOutput("ratePlot", hover="plot_hover2"), 
-                 verbatimTextOutput("rateInfo"),
-                 downloadButton("ageAdjDownload", "Download Age-adjusted Death Rate Plot"))),
+                        plotOutput("deathPlot", hover= "plot_hover"), 
+                        verbatimTextOutput("deathInfo"),
+                        downloadButton("deathDownload", "Download Death Plot")),
+                    column(6,
+                        plotOutput("ratePlot", hover="plot_hover2"), 
+                        verbatimTextOutput("rateInfo"),
+                        downloadButton("ageAdjDownload", "Download Age-adjusted Death Rate Plot"))),
                  br(),
                  br(),
                  fluidRow(
                      column(12,align="center",
-                 h1("Numeric Summaries:"))),
+                        h1("Numeric Summaries:"))),
                  br(),
                  fluidRow(
                      column(12,align="center",
@@ -74,6 +77,7 @@ shinyUI(fluidPage(navbarPage(
                         verbatimTextOutput("summary"))))
         )
         ),
+    #set up clustering tab
     tabPanel("Clustering",
         sidebarLayout(
             sidebarPanel(
@@ -95,63 +99,65 @@ shinyUI(fluidPage(navbarPage(
             )
             )
         ),
+    #set up data modeling tab
     tabPanel("Data Modeling",
              sidebarLayout(
-                 sidebarPanel(
-                     style="position:fixed;width:inherit;",
-                     fluidRow(
-                            h4("Select State:"),
-                            selectizeInput("place", "State", choices=levels(as.factor(deathData$State))),
-                            h4("Select Cause of Death Name:"),
-                            selectizeInput("disease","Cause of Death Name", levels(as.factor(deathData$`Cause Name`)))
+                sidebarPanel(
+                    style="position:fixed;width:inherit;",
+                    fluidRow(
+                        h4("Select State:"),
+                        selectizeInput("place", "State", choices=levels(as.factor(deathData$State))),
+                        h4("Select Cause of Death Name:"),
+                        selectizeInput("disease","Cause of Death Name", levels(as.factor(deathData$`Cause Name`)))
                          )),
-                     mainPanel(
-                         fluidRow(
-                             column(12,align="center",
-                                    h1("Simple Linear Regression"))),
-                         br(),
-                         fluidRow(
-                            column(6,
-                         plotOutput("simpLinRegPlot1"),
-                         downloadButton("simpDownload1","Download Deaths vs Year Plot"),
-                         br(),
-                         verbatimTextOutput("regsummary1"),
-                         numericInput("inputYearPredictDeaths", label="Input Year to Predict Number of Deaths:", value=2016, min=2016, max=2050),
-                         verbatimTextOutput("predictDeaths")),
-                         column(6,
-                                plotOutput("simpLinRegPlot2"),
-                                downloadButton("simpDownload2","Download Age-adjusted Death Rate vs Year"),
-                                br(),
-                                verbatimTextOutput("regsummary2"),
-                                numericInput("inputYearPredictRate", label="Input Year to Predict Age-adjusted Death Rate:", value=2016, min=2016, max=2050),
-                         verbatimTextOutput("predictRate"))),
-                         br(),
-                                fluidRow(
-                                    column(12,align="center",
-                                           h1("K Nearest Neighbors"))),
-                         br(),
-                         fluidRow(
-                             column(6,
-                                 numericInput("inputAgeRate",label="Input Age-adjusted Death Rate to Predict Cause Name:", value=1, min=0, max=1500)),
-                             column(6,
-                                numericInput("inputDeaths", label="Input Number of Deaths to Predict Cause Name:",value=1, min=0, max=3000000))),
-                        fluidRow(
-                            column(12, align="center",
-                                verbatimTextOutput("knn")))
+                mainPanel(
+                    fluidRow(
+                        column(12,align="center",
+                            h1("Simple Linear Regression"))),
+                    br(),
+                    fluidRow(
+                        column(6,
+                            plotOutput("simpLinRegPlot1"),
+                            downloadButton("simpDownload1","Download Deaths vs Year Plot"),
+                            br(),
+                            verbatimTextOutput("regsummary1"),
+                            numericInput("inputYearPredictDeaths", label="Input Year to Predict Number of Deaths:", value=2016, min=2016, max=2050),
+                            verbatimTextOutput("predictDeaths")),
+                        column(6,
+                            plotOutput("simpLinRegPlot2"),
+                            downloadButton("simpDownload2","Download Age-adjusted Death Rate vs Year"),
+                            br(),
+                            verbatimTextOutput("regsummary2"),
+                            numericInput("inputYearPredictRate", label="Input Year to Predict Age-adjusted Death Rate:", value=2016, min=2016, max=2050),
+                            verbatimTextOutput("predictRate"))),
+                    br(),
+                    fluidRow(
+                        column(12,align="center",
+                            h1("K Nearest Neighbors"))),
+                    br(),
+                    fluidRow(
+                        column(6,
+                            numericInput("inputAgeRate",label="Input Age-adjusted Death Rate to Predict Cause of Death Name:", value=1, min=0, max=1500)),
+                        column(6,
+                            numericInput("inputDeaths", label="Input Number of Deaths to Predict Cause of Death Name:",value=1, min=0, max=3000000))),
+                    fluidRow(
+                        column(12, align="center",
+                            verbatimTextOutput("knn")))
                      )
              )),
+    #set up data table tab
     tabPanel("Data Table",
         sidebarLayout(
-             sidebarPanel(
-                 h4("Download Data as CSV File Below"),
-                 downloadButton("downloadData", "Download Data Table")
+            sidebarPanel(
+                h4("Download Data as CSV File Below"),
+                downloadButton("downloadData", "Download Data Table")
                  ),
-                 mainPanel(
-                     fluidRow(
-                         column(12, align="center",
-                                h1("Ten Leading Causes of Deaths in The United States from 1999-2016")
+            mainPanel(
+                fluidRow(
+                    column(12, align="center",
+                        h1("Ten Leading Causes of Deaths in The United States from 1999-2016")
                      )),
-                     DT::dataTableOutput("table"))
+                DT::dataTableOutput("table"))
         )
     )
 )))
