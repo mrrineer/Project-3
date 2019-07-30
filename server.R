@@ -250,28 +250,28 @@ shinyServer(function(input, output, session) {
   })
   
   #k nearest neighbors model
-  getknnData<-reactive({
-    knnData<-deathData %>% filter(`Age-adjusted Death Rate`==input$ageRate) %>% filter(Deaths ==input$numDeaths)
-  })
-    
-    #predict cause of death name via death rate and number of deaths
-  df<-reactive(
-    data.frame(`Age-adjusted Death Rate`=input$ageRate, Deaths= input$numDeaths)
-  )
-  #train and test sets
+  #divide data into train and test sets
   train <- sample(1:nrow(deathData), size = nrow(deathData)*0.8)
   test <- dplyr::setdiff(1:nrow(deathData), train)
   deathDataTest <- deathData[test, ]
   deathDataTrain <- deathData[train, ]
+  #rename so when made into data frame below it can be found 
   names(deathDataTrain)[5]<-"Age.adjusted.Death.Rate"
   
-      #fit model
-      knnFit <- train(`Cause Name` ~ Age.adjusted.Death.Rate+Deaths, data = deathDataTrain, method = "knn",
-                       trControl = trainControl(method = "repeatedcv", number = 10, repeats = 5),
-                       preProcess = c("center", "scale"))
+  #make reactive data frame from user inputs for age-adjusted death rate and number of deaths
+  df<-reactive(
+    data.frame(`Age-adjusted Death Rate`=input$ageRate, Deaths= input$numDeaths)
+  )
+
+  #fit model
+  knnFit <- train(`Cause Name` ~ Age.adjusted.Death.Rate+Deaths, 
+                  data = deathDataTrain, 
+                  method = "knn",
+                  trControl = trainControl(method = "repeatedcv", number = 10, repeats = 5),
+                  preProcess = c("center", "scale"))
+  #output prediction for user inputed age-adjusted death rate and number of deaths
   output$knn<-renderPrint({  
     predict(knnFit, newdata=data.frame(df()))
-    
   })
   
   #begin code for data table tab
