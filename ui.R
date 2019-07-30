@@ -8,6 +8,11 @@ data<-read_csv("Leading Causes of Death.csv")
 #filter data
 deathData<- data %>% select(Year, `Cause Name`, State, Deaths, `Age-adjusted Death Rate`)
 
+train <- sample(1:nrow(deathData), size = nrow(deathData)*0.8)
+test <- dplyr::setdiff(1:nrow(deathData), train)
+deathDataTest <- deathData[test, ]
+deathDataTrain <- deathData[train, ]
+
 #set up UI file
 shinyUI(fluidPage(navbarPage(
     "Exploration of the 10 Leading Causes of Death in The United States",
